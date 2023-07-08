@@ -75,7 +75,7 @@ def crear_paquete(usuario):
     return paquete
 
 
-# Ejemplo de uso
+
 usuario = registrar_cuenta_usuario()
 factura = registrar_factura_electronica()
 crear_paquete(usuario)

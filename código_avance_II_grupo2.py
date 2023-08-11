@@ -1,5 +1,5 @@
 import random
-
+#Proyecto de Github 
 class Usuario:
     def __init__(self, correo, nombre_comercio, telefono_comercio, nombre_dueno, ubicacion_local):
         self.correo = correo

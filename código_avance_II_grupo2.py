@@ -7,7 +7,7 @@ class Usuario:
         self.telefono_comercio = telefono_comercio
         self.nombre_dueno = nombre_dueno
         self.ubicacion_local = ubicacion_local
-#Seccion de funciones
+#procesos
 class FacturaElectronica:
     def __init__(self, tipo_cedula, numero_cedula, nombre, telefono, correo, provincia, canton, distrito):
         self.tipo_cedula = tipo_cedula

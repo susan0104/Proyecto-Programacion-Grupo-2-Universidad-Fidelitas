@@ -175,3 +175,40 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+#Función para hacer el modulo de estadisticas 
+def guardar_estadisticas(usuario):
+    cantidad_envios, paquetes_enviados, monto_cobro_total, cantidad_por_telefono, cantidad_por_cedula = obtener_estadisticas(usuario)
+
+    with open("estadisticas.txt", "w") as archivo:
+        archivo.write("Estadísticas del usuario:\n")
+        archivo.write("Cantidad de envíos: {}\n".format(cantidad_envios))
+        archivo.write("Paquetes enviados:\n")
+        for paquete in paquetes_enviados:
+            archivo.write("- {}\n".format(paquete))
+        archivo.write("Monto de cobro total: {}\n".format(monto_cobro_total))
+        archivo.write("Cantidad de paquetes por número de teléfono: {}\n".format(cantidad_por_telefono))
+        archivo.write("Cantidad de paquetes por número de cédula: {}\n".format(cantidad_por_cedula))
+
+def main():
+    usuario = registrar_cuenta_usuario()
+    guias_utilizadas = set()  
+    envio = crear_envio(usuario, guias_utilizadas)
+
+    num_guia_rastreo = input("Ingrese el número de guía para rastrear el paquete: ")
+    paquete_rastreado = rastrear_paquete(num_guia_rastreo)
+
+    if paquete_rastreado:
+        print("Estado del paquete:", paquete_rastreado.estado)
+    else:
+        print("El paquete con el número de guía especificado no fue encontrado.")
+
+    # Mostrar estadísticas del usuario
+    mostrar_estadisticas(usuario)  # Llamada a la función de estadísticas
+
+    # Guardar estadísticas en un archivo
+    guardar_estadisticas(usuario)
+
+if __name__ == "__main__":
+    main()
+

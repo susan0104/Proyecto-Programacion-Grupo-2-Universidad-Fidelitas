@@ -1,6 +1,5 @@
 import random
-#Proyecto de Github
-#comentario de prueba
+
 class Usuario:
     def __init__(self, correo, nombre_comercio, telefono_comercio, nombre_dueno, ubicacion_local):
         self.correo = correo
@@ -8,7 +7,7 @@ class Usuario:
         self.telefono_comercio = telefono_comercio
         self.nombre_dueno = nombre_dueno
         self.ubicacion_local = ubicacion_local
-#procesos
+
 class FacturaElectronica:
     def __init__(self, tipo_cedula, numero_cedula, nombre, telefono, correo, provincia, canton, distrito):
         self.tipo_cedula = tipo_cedula
@@ -81,35 +80,40 @@ def registrar_factura_electronica():
 
     factura = FacturaElectronica(tipo_cedula, numero_cedula, nombre, telefono, correo, provincia, canton, distrito)
     return factura
-
+#arreglo en creacion de paquetes
 def crear_paquete(usuario, guias_utilizadas):
     print("**********Registrar paquete**************")
     nombre_destinatario = input("Ingrese el nombre del destinatario: ")
     telefono_destinatario = input("Ingrese el teléfono del destinatario: ")
     numero_cedula = input("Ingrese el número de cédula: ")
-    peso = float(input("Ingrese el peso del paquete en kilogramos: "))
+    try:
+        peso = float(input("Ingrese el peso del paquete en kilogramos: "))
+    except ValueError:
+        print("Peso inválido. El paquete no será creado.")
+        return None
     cobro_contra_entrega = input("¿Desea cobrar contra entrega? (S/N): ")
-
+   
     if cobro_contra_entrega.upper() == 'S':
-        monto_cobro = float(input("Ingrese el monto en colones a cobrar contra entrega: "))
+       monto_cobro = peso * 500 
+       monto_cobro_contra_entrega = monto_cobro
+       print(f"El monto a cobrar contra entrega es: {monto_cobro} colones")
     else:
-        monto_cobro = 0.0
-    print("*******************************")
-
-    while True:
+       monto_cobro = 0.0
+       print("No se cobrará contra entrega.")
+    num_guia = random.randint(100, 1000)
+    while num_guia in guias_utilizadas:
         num_guia = random.randint(100, 1000)
-        if num_guia not in guias_utilizadas:
-            guias_utilizadas.add(num_guia)
-            break
-
+        
     nombre_comercio = usuario.nombre_comercio
     num_comercio = usuario.telefono_comercio
     guia = Guia(num_guia, nombre_comercio, num_comercio, nombre_destinatario, telefono_destinatario)
     paquete = Paquete(nombre_destinatario, telefono_destinatario, numero_cedula, peso, monto_cobro, num_guia)
     envio = Envio(paquete, guia)
-    envios.append(envio)  # Agregar el envío a la lista
+    envios.append(envio)
+    print("Paquete creado con número de guía:", envio.guia.num_guia)
+    print("*******************************")
     return envio
-
+       
 def cambiar_estado(envio, nuevo_estado):
     estados_validos = ["Creado", "Recolectado", "Entrega Fallida", "Entregado"]
     if nuevo_estado in estados_validos:
@@ -127,15 +131,18 @@ def marcar_entregado(envio):
     cambiar_estado(envio, "Entregado")
 
 def rastrear_paquete(num_guia):
+    num_guia = int(num_guia)  # Convertir la cadena en un entero
     for envio in envios:
         if envio.guia.num_guia == num_guia:
             return envio
-    return None  
+    return None
 
 def obtener_estadisticas(usuario):
     cantidad_envios = len(envios)
     paquetes_enviados = [envio.paquete for envio in envios]
     monto_cobro_total = sum(envio.paquete.cobro_contra_entrega for envio in envios)
+    
+    
     cantidad_por_telefono = sum(1 for envio in envios if envio.paquete.telefono_destinatario == usuario.telefono_comercio)
     cantidad_por_cedula = sum(1 for envio in envios if envio.paquete.numero_cedula == usuario.correo)
 
@@ -144,10 +151,12 @@ def obtener_estadisticas(usuario):
 def crear_envio(usuario, guias_utilizadas):
     factura = registrar_factura_electronica()
     envio = crear_paquete(usuario, guias_utilizadas)
-
-    print("Paquete creado con número de guía:", envio.guia.num_guia)
-    marcar_recolectado(envio)
-
+    if envio:  # Verificar si el paquete se creó correctamente
+        print("Paquete creado con número de guía:", envio.guia.num_guia)
+        marcar_recolectado(envio)
+    else:
+        print("Error al crear el paquete. No se pudo crear el envío.")
+    
     return envio
 
 def main():
@@ -160,6 +169,17 @@ def main():
 
     if paquete_rastreado:
         print("Estado del paquete:", paquete_rastreado.estado)
+        
+        opcion = input("Seleccione una acción:\n1. Marcar como recolectado\n2. Marcar como entrega fallida\n3. Marcar como entregado\nOpción: ")
+        
+        if opcion == "1":
+            marcar_recolectado(paquete_rastreado)
+        elif opcion == "2":
+            marcar_entrega_fallida(paquete_rastreado)
+        elif opcion == "3":
+            marcar_entregado(paquete_rastreado)
+        else:
+            print("Opción inválida.")
     else:
         print("El paquete con el número de guía especificado no fue encontrado.")
 
@@ -172,10 +192,6 @@ def main():
     print("Monto de cobro total:", monto_cobro_total)
     print("Cantidad de paquetes por número de teléfono:", cantidad_por_telefono)
     print("Cantidad de paquetes por número de cédula:", cantidad_por_cedula)
-
-if __name__ == "__main__":
-    main()
-    
 #Función para hacer el modulo de estadisticas 
 def guardar_estadisticas(usuario):
     cantidad_envios, paquetes_enviados, monto_cobro_total, cantidad_por_telefono, cantidad_por_cedula = obtener_estadisticas(usuario)
@@ -202,12 +218,20 @@ def main():
         print("Estado del paquete:", paquete_rastreado.estado)
     else:
         print("El paquete con el número de guía especificado no fue encontrado.")
+# #Obtener y mostrar estadísticas del usuario
+    cantidad_envios, paquetes_enviados, monto_cobro_total, cantidad_por_telefono, cantidad_por_cedula = obtener_estadisticas(usuario)
 
-    # Mostrar estadísticas del usuario
-    mostrar_estadisticas(usuario)  # Llamada a la función de estadísticas
+    print("Estadísticas:")
+    print("Cantidad de envíos:", cantidad_envios)
+    print("Paquetes enviados:", paquetes_enviados)
+    print("Monto de cobro total:", monto_cobro_total)
+    print("Cantidad de paquetes por número de teléfono:", cantidad_por_telefono)
+    print("Cantidad de paquetes por número de cédula:", cantidad_por_cedula)
 
     # Guardar estadísticas en un archivo
     guardar_estadisticas(usuario)
+
+
 
 if __name__ == "__main__":
     main()

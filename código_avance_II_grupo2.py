@@ -1,50 +1,6 @@
 import random
 
-class Usuario:
-    def __init__(self, correo, nombre_comercio, telefono_comercio, nombre_dueno, ubicacion_local):
-        self.correo = correo
-        self.nombre_comercio = nombre_comercio
-        self.telefono_comercio = telefono_comercio
-        self.nombre_dueno = nombre_dueno
-        self.ubicacion_local = ubicacion_local
-
-class FacturaElectronica:
-    def __init__(self, tipo_cedula, numero_cedula, nombre, telefono, correo, provincia, canton, distrito):
-        self.tipo_cedula = tipo_cedula
-        self.numero_cedula = numero_cedula
-        self.nombre = nombre
-        self.telefono = telefono
-        self.correo = correo
-        self.provincia = provincia
-        self.canton = canton
-        self.distrito = distrito
-
-class Paquete:
-    def __init__(self, nombre_destinatario, telefono_destinatario, numero_cedula, peso, cobro_contra_entrega, num_guia):
-        self.nombre_destinatario = nombre_destinatario
-        self.telefono_destinatario = telefono_destinatario
-        self.numero_cedula = numero_cedula
-        self.peso = peso
-        self.cobro_contra_entrega = cobro_contra_entrega
-        self.num_guia = num_guia
-
-class Guia:
-    def __init__(self, num_guia, nombre_comercio, num_comercio, nombre_destinatario, num_destinatario):
-        self.num_guia = num_guia
-        self.nombre_comercio = nombre_comercio
-        self.num_comercio = num_comercio
-        self.nombre_destinatario = nombre_destinatario
-        self.num_destinatario = num_destinatario
-
-class Envio:
-    def __init__(self, paquete, guia):
-        self.paquete = paquete
-        self.guia = guia
-        self.estado = "Creado"
-
-envios = []  
-
-def registrar_cuenta_usuario():
+def registrar_usuario():
     print("**********Registrar cuenta de usuario**********")
     correo = input("Ingrese su correo electrónico: ")
     nombre_comercio = input("Ingrese el nombre del comercio: ")
@@ -53,10 +9,22 @@ def registrar_cuenta_usuario():
     ubicacion_local = input("Ingrese la ubicación del local: ")
     print("*******************************")
 
-    usuario = Usuario(correo, nombre_comercio, telefono_comercio, nombre_dueno, ubicacion_local)
+    usuario = {
+        'correo': correo,
+        'nombre_comercio': nombre_comercio,
+        'telefono_comercio': telefono_comercio,
+        'nombre_dueno': nombre_dueno,
+        'ubicacion_local': ubicacion_local
+    }
+
+    with open('usuario.txt', 'w') as archivo:
+        for clave, valor in usuario.items():
+            archivo.write(f"{clave}: {valor}\n")
+    
     return usuario
 
-def registrar_factura_electronica():
+
+def registrar_factura():
     print("**********Registrar factura electrónica*********")
     print("Seleccione el tipo de cédula:")
     print("1. Cédula Física")
@@ -78,161 +46,204 @@ def registrar_factura_electronica():
     distrito = input("Ingrese el distrito: ")
     print("*******************************")
 
-    factura = FacturaElectronica(tipo_cedula, numero_cedula, nombre, telefono, correo, provincia, canton, distrito)
+    factura = {
+        'tipo_cedula': tipo_cedula,
+        'numero_cedula': numero_cedula,
+        'nombre': nombre,
+        'telefono': telefono,
+        'correo': correo,
+        'provincia': provincia,
+        'canton': canton,
+        'distrito': distrito
+    }
+    with open('factura.txt', 'w') as archivo:
+        for clave, valor in factura.items():
+            archivo.write(f"{clave}: {valor}\n")
+
     return factura
-#arreglo en creacion de paquetes
-def crear_paquete(usuario, guias_utilizadas):
+
+
+def crear_paquete():
     print("**********Registrar paquete**************")
     nombre_destinatario = input("Ingrese el nombre del destinatario: ")
     telefono_destinatario = input("Ingrese el teléfono del destinatario: ")
     numero_cedula = input("Ingrese el número de cédula: ")
-    try:
-        peso = float(input("Ingrese el peso del paquete en kilogramos: "))
-    except ValueError:
-        print("Peso inválido. El paquete no será creado.")
-        return None
-    cobro_contra_entrega = input("¿Desea cobrar contra entrega? (S/N): ")
-   
-    if cobro_contra_entrega.upper() == 'S':
-       monto_cobro = peso * 500 
-       monto_cobro_contra_entrega = monto_cobro
-       print(f"El monto a cobrar contra entrega es: {monto_cobro} colones")
-    else:
-       monto_cobro = 0.0
-       print("No se cobrará contra entrega.")
-    num_guia = random.randint(100, 1000)
-    while num_guia in guias_utilizadas:
-        num_guia = random.randint(100, 1000)
-        
-    nombre_comercio = usuario.nombre_comercio
-    num_comercio = usuario.telefono_comercio
-    guia = Guia(num_guia, nombre_comercio, num_comercio, nombre_destinatario, telefono_destinatario)
-    paquete = Paquete(nombre_destinatario, telefono_destinatario, numero_cedula, peso, monto_cobro, num_guia)
-    envio = Envio(paquete, guia)
-    envios.append(envio)
-    print("Paquete creado con número de guía:", envio.guia.num_guia)
+    peso = float(input("Ingrese el peso del paquete en kilogramos: "))
+    monto_cobro = peso * 500
+    cobro_contra_entrega = input("¿Desea cobrar contra entrega? (S/N): ").strip()
     print("*******************************")
-    return envio
-       
-def cambiar_estado(envio, nuevo_estado):
-    estados_validos = ["Creado", "Recolectado", "Entrega Fallida", "Entregado"]
-    if nuevo_estado in estados_validos:
-        envio.estado = nuevo_estado
+
+    paquete = {
+        'nombre_destinatario': nombre_destinatario,
+        'telefono_destinatario': telefono_destinatario,
+        'numero_cedula': numero_cedula,
+        'peso': peso,
+        'cobro_contra_entrega': cobro_contra_entrega,
+        'monto_cobro': monto_cobro
+    }
+
+    with open('paquete.txt', 'w') as archivo:
+        for clave, valor in paquete.items():
+            archivo.write(f"{clave}: {valor}\n")
+    
+    numero_guia = ''.join(random.choice('0123456789ABCDEF') for _ in range(8))
+    print("El número de guía para el rastreo del paquete es: ")
+            
+    with open(f'guia_{numero_guia}.txt', 'w') as archivo_guia:
+        archivo_guia.write(f"Número de guía: {numero_guia}\n")
+        archivo_guia.write("Información del destinatario:\n")
+        archivo_guia.write(f"  Nombre: {nombre_destinatario}\n")
+        archivo_guia.write(f"  Teléfono: {telefono_destinatario}\n")
+        archivo_guia.write(f"  Estado: Creado\n")
+        if cobro_contra_entrega.lower() == 's':
+            archivo_guia.write("Requiere cobro\n")
+            archivo_guia.write(f"Monto a cobrar: {monto_cobro}\n")
+
+
+    return paquete
+
+def cambiar_estado():
+    while True:
+        numero_guia_buscar = input("Ingrese el número de guía para buscar el paquete: ")
+        archivo_guia_path = f'guia_{numero_guia_buscar}.txt'
+
+        try:
+            with open(archivo_guia_path, 'r') as archivo_guia:
+                guia_contenido = archivo_guia.read()
+                break
+        except FileNotFoundError:
+            print("La guía no existe. Intente de nuevo.")
+
+    print("********Lista de estados disponibles para el paquete**********")
+    print("1. Creado")
+    print("2. Recolectado")
+    print("3. Entrega Fallida")
+    print("4. Entregado")
+    seleccion = input('Ingrese una opcion de los estados disponibles: ')
+    if seleccion == "1":
+        nuevo_estado = "Creado"
+    elif seleccion == "2":
+        nuevo_estado = "Recolectado"
+    elif seleccion == "3":
+        nuevo_estado = "Entrega Fallida"
+    elif seleccion == "4":
+        nuevo_estado = "Entregado"
     else:
-        print("Estado inválido. Los estados válidos son:", estados_validos)
+        print("Ingreso un numero incorrecto, error en el cambio de estado de paquete!")
 
-def marcar_recolectado(envio):
-    cambiar_estado(envio, "Recolectado")
+    with open(archivo_guia_path, 'w') as archivo_guia:
+        guia_contenido = guia_contenido.replace("Estado: Creado", f"Estado: {nuevo_estado}")
+        archivo_guia.write(guia_contenido)
 
-def marcar_entrega_fallida(envio):
-    cambiar_estado(envio, "Entrega Fallida")
+    print(f"El estado de la guía {numero_guia_buscar} se ha cambiado a '{nuevo_estado}'.")
 
-def marcar_entregado(envio):
-    cambiar_estado(envio, "Entregado")
+def rastreo_paquetes():
+    while True:
+        numero_guia_buscar = input("Ingrese el número de guía para rastrear el paquete: ")
+        archivo_guia_path = f'guia_{numero_guia_buscar}.txt'
 
-def rastrear_paquete(num_guia):
-    num_guia = int(num_guia)  # Convertir la cadena en un entero
-    for envio in envios:
-        if envio.guia.num_guia == num_guia:
-            return envio
-    return None
+        try:
+            with open(archivo_guia_path, 'r') as archivo_guia:
+                print("Datos del paquete:")
+                for linea in archivo_guia:
+                    print(linea.strip())
+            break
+        except FileNotFoundError:
+            print("La guía no existe. Intente de nuevo.")
 
-def obtener_estadisticas(usuario):
-    cantidad_envios = len(envios)
-    paquetes_enviados = [envio.paquete for envio in envios]
-    monto_cobro_total = sum(envio.paquete.cobro_contra_entrega for envio in envios)
+def modulo_estadisticas():
+    print("********** Módulo de Estadísticas **********")
+
+    try:
+        with open('usuario.txt', 'r') as archivo_usuario:
+            lineas_usuario = archivo_usuario.readlines()
+            nombre_comercio = lineas_usuario[1].strip().split(":")[1].strip()
+    except FileNotFoundError:
+        print("No se encontró información de usuario registrada.")
+        return
+
+    print(f"Estadísticas para el comercio '{nombre_comercio}':")
     
+    # Obtener la cantidad de guías generadas
+    cantidad_envios = sum(1 for _ in open('paquete.txt', 'r'))
+    print(f"Cantidad de envíos: {cantidad_envios}")
+
+    # Obtener la lista de paquetes enviados
+    lista_paquetes = []
+    try:
+        with open('paquete.txt', 'r') as archivo_paquete:
+            for linea in archivo_paquete:
+                clave, valor = linea.strip().split(":")
+                lista_paquetes.append(f"{clave.strip()}: {valor.strip()}")
+        print("Lista de paquetes enviados:")
+        for paquete in lista_paquetes:
+            print(paquete)
+    except FileNotFoundError:
+        print("No se encontraron paquetes registrados.")
+
+    # Obtener el monto total de cobro
+    monto_total_cobro = sum(float(linea.strip().split(":")[1]) for linea in open('paquete.txt', 'r') if "monto_cobro" in linea)
+    print(f"Monto total de cobro: {monto_total_cobro}")
+
+    # Obtener cantidad de paquetes por número de teléfono
+    dic_telefonos = {}
+    with open('paquete.txt', 'r') as archivo_paquete:
+        for linea in archivo_paquete:
+            if "telefono_destinatario" in linea:
+                telefono = linea.strip().split(":")[1].strip()
+                dic_telefonos[telefono] = dic_telefonos.get(telefono, 0) + 1
+    print("Cantidad de paquetes por número de teléfono:")
+    for telefono, cantidad in dic_telefonos.items():
+        print(f"Número de teléfono: {telefono} - Cantidad de paquetes: {cantidad}")
+
+    # Obtener cantidad de paquetes por número de cédula
+    dic_cedulas = {}
+    with open('paquete.txt', 'r') as archivo_paquete:
+        for linea in archivo_paquete:
+            if "numero_cedula" in linea:
+                cedula = linea.strip().split(":")[1].strip()
+                dic_cedulas[cedula] = dic_cedulas.get(cedula, 0) + 1
+    print("Cantidad de paquetes por número de cédula:")
+    for cedula, cantidad in dic_cedulas.items():
+        print(f"Número de cédula: {cedula} - Cantidad de paquetes: {cantidad}")
+
+    print("*******************************************")
+
+
+print("***************************Bienvenido a Mensajería Fidélitas***************************")
+
+funcionamiento = True
+
+while funcionamiento:
+    print("Opciones de usuario Mensajería Fidélitas: ")
+    print("1. Crear usuario")
+    print("2. Crear factura electrónica")
+    print("3. Crear paquete")
+    print("4. Cambiar estado de un paquete")
+    print("5. Rastrear un paquete")
+    print("6. Módulo de estadísticas")
+    print("7. Salir")
     
-    cantidad_por_telefono = sum(1 for envio in envios if envio.paquete.telefono_destinatario == usuario.telefono_comercio)
-    cantidad_por_cedula = sum(1 for envio in envios if envio.paquete.numero_cedula == usuario.correo)
-
-    return cantidad_envios, paquetes_enviados, monto_cobro_total, cantidad_por_telefono, cantidad_por_cedula
-
-def crear_envio(usuario, guias_utilizadas):
-    factura = registrar_factura_electronica()
-    envio = crear_paquete(usuario, guias_utilizadas)
-    if envio:  # Verificar si el paquete se creó correctamente
-        print("Paquete creado con número de guía:", envio.guia.num_guia)
-        marcar_recolectado(envio)
+    menu = input("Ingrese una de las opciones: ")
+    
+    if menu == "1":
+        registrar_usuario()
+    elif menu == "2":
+        registrar_factura()
+    elif menu == "3":
+        crear_paquete()
+    elif menu == "4":
+        cambiar_estado()
+    elif menu == "5":
+        rastreo_paquetes()
+    elif menu == "6":
+        modulo_estadisticas()
+    elif menu == "7":
+        print("Gracias por participar!")
+        break
     else:
-        print("Error al crear el paquete. No se pudo crear el envío.")
-    
-    return envio
+        print("Opción inválida!")
 
-def main():
-    usuario = registrar_cuenta_usuario()
-    guias_utilizadas = set()  
-    envio = crear_envio(usuario, guias_utilizadas)
-
-    num_guia_rastreo = input("Ingrese el número de guía para rastrear el paquete: ")
-    paquete_rastreado = rastrear_paquete(num_guia_rastreo)
-
-    if paquete_rastreado:
-        print("Estado del paquete:", paquete_rastreado.estado)
         
-        opcion = input("Seleccione una acción:\n1. Marcar como recolectado\n2. Marcar como entrega fallida\n3. Marcar como entregado\nOpción: ")
-        
-        if opcion == "1":
-            marcar_recolectado(paquete_rastreado)
-        elif opcion == "2":
-            marcar_entrega_fallida(paquete_rastreado)
-        elif opcion == "3":
-            marcar_entregado(paquete_rastreado)
-        else:
-            print("Opción inválida.")
-    else:
-        print("El paquete con el número de guía especificado no fue encontrado.")
 
-    # Obtener estadísticas del usuario
-    cantidad_envios, paquetes_enviados, monto_cobro_total, cantidad_por_telefono, cantidad_por_cedula = obtener_estadisticas(usuario)
-
-    print("Estadísticas:")
-    print("Cantidad de envíos:", cantidad_envios)
-    print("Paquetes enviados:", paquetes_enviados)
-    print("Monto de cobro total:", monto_cobro_total)
-    print("Cantidad de paquetes por número de teléfono:", cantidad_por_telefono)
-    print("Cantidad de paquetes por número de cédula:", cantidad_por_cedula)
-#Función para hacer el modulo de estadisticas 
-def guardar_estadisticas(usuario):
-    cantidad_envios, paquetes_enviados, monto_cobro_total, cantidad_por_telefono, cantidad_por_cedula = obtener_estadisticas(usuario)
-
-    with open("estadisticas.txt", "w") as archivo:
-        archivo.write("Estadísticas del usuario:\n")
-        archivo.write("Cantidad de envíos: {}\n".format(cantidad_envios))
-        archivo.write("Paquetes enviados:\n")
-        for paquete in paquetes_enviados:
-            archivo.write("- {}\n".format(paquete))
-        archivo.write("Monto de cobro total: {}\n".format(monto_cobro_total))
-        archivo.write("Cantidad de paquetes por número de teléfono: {}\n".format(cantidad_por_telefono))
-        archivo.write("Cantidad de paquetes por número de cédula: {}\n".format(cantidad_por_cedula))
-
-def main():
-    usuario = registrar_cuenta_usuario()
-    guias_utilizadas = set()  
-    envio = crear_envio(usuario, guias_utilizadas)
-
-    num_guia_rastreo = input("Ingrese el número de guía para rastrear el paquete: ")
-    paquete_rastreado = rastrear_paquete(num_guia_rastreo)
-
-    if paquete_rastreado:
-        print("Estado del paquete:", paquete_rastreado.estado)
-    else:
-        print("El paquete con el número de guía especificado no fue encontrado.")
-# #Obtener y mostrar estadísticas del usuario
-    cantidad_envios, paquetes_enviados, monto_cobro_total, cantidad_por_telefono, cantidad_por_cedula = obtener_estadisticas(usuario)
-
-    print("Estadísticas:")
-    print("Cantidad de envíos:", cantidad_envios)
-    print("Paquetes enviados:", paquetes_enviados)
-    print("Monto de cobro total:", monto_cobro_total)
-    print("Cantidad de paquetes por número de teléfono:", cantidad_por_telefono)
-    print("Cantidad de paquetes por número de cédula:", cantidad_por_cedula)
-
-    # Guardar estadísticas en un archivo
-    guardar_estadisticas(usuario)
-
-
-
-if __name__ == "__main__":
-    main()
 
